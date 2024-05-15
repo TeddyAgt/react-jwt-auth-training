@@ -1,23 +1,15 @@
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { createUser } from "../../API/users";
-import { useNavigate } from "react-router-dom";
+import { signin } from "../../API/auth";
 
-function Signup() {
-  const navigate = useNavigate();
-
+function Signin() {
   const defaultValues = {
-    username: "",
     email: "",
     password: "",
   };
 
   const validationSchema = yup.object({
-    username: yup
-      .string()
-      .required("This fiels is required")
-      .min(5, "Too short"),
     email: yup
       .string()
       .required("This field is required")
@@ -39,11 +31,11 @@ function Signup() {
     resolver: yupResolver(validationSchema),
   });
 
-  const submit = handleSubmit(async (user) => {
+  const submit = handleSubmit(async (credentials) => {
     clearErrors();
     try {
-      await createUser(user);
-      navigate("/signin");
+      const user = await signin(credentials);
+      console.log(user);
     } catch (e) {
       setError("generic", { type: "generic", message: e });
     }
@@ -51,26 +43,10 @@ function Signup() {
 
   return (
     <section className="flex-auto flex items-center justify-center flex-col">
-      <h1 className="text-5xl mb-4 font-bold">Sign Up</h1>
+      <h1 className="text-5xl mb-4 font-bold">Sign In</h1>
       <form
         onSubmit={submit}
         className="flex flex-col bg-white max-w-[500px] p-4 rounded shadow-lg min-w-[300px]">
-        <div className="mb-4 flex flex-col">
-          <label
-            className="mb-2"
-            htmlFor="username">
-            Username
-          </label>
-          <input
-            {...register("username")}
-            type="text"
-            id="username"
-            name="username"
-            className="border rounded p-1"
-          />
-          {errors.username && <p>{errors.username.message}</p>}
-        </div>
-
         <div className="mb-4 flex flex-col">
           <label
             className="mb-2"
@@ -116,4 +92,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signin;
